@@ -8,6 +8,8 @@ cd webserver
 ./compile.mingw.bat
 ```
 
+Get the executable from the '/debug' folder
+
 Access the server from 
 ```
 http://localhost:8080/
