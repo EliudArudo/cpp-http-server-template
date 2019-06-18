@@ -128,5 +128,5 @@ void Controller::Request_Handler(webserver::http_request *r)
 
     json jmap(json_map_response); // Converting map to JSON
 
-    r->answer_ = jmap.dump();
+    r->answer_ = jmap.dump(); // Find out how to receive data
 };
