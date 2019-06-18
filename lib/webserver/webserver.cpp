@@ -65,7 +65,8 @@ unsigned webserver::Request(void *ptr_s)
   std::string path;
   std::map<std::string, std::string> params;
 
-  size_t posStartPath = line.find_first_not_of(" ", 3);
+  // size_t posStartPath = line.find_first_not_of(" ", 3);
+  size_t posStartPath = line.find_first_not_of(" ", req.method_.length());
 
   SplitGetReq(line.substr(posStartPath), path, params);
 

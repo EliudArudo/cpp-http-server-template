@@ -6,5 +6,7 @@
 int main()
 {
 
-  webserver(8080, Controller::Request_Handler);
+  int port = 8080; // Should be set through an environment variable
+
+  webserver(port, Controller::Request_Handler);
 }

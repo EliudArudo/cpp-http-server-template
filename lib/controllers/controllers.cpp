@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "../webserver/webserver.h"
 #include "../socket/src/Socket.h"
 #include "../nlohmann/json.hpp"
@@ -115,6 +117,7 @@ void Controller::Request_Handler(webserver::http_request *r)
     }
     else
     {
+
         r->status_ = "404 Not Found";
         title = "Wrong URL";
         body = "<h1>Wrong URL</h1>";
