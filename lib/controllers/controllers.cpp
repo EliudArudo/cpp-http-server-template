@@ -1,7 +1,10 @@
 #include "../webserver/webserver.h"
 #include "../socket/src/Socket.h"
+#include "../nlohmann/json.hpp"
 
 #include "controllers.h"
+
+using nlohmann::json; // Important for sending back JSON
 
 void Controller::Request_Handler(webserver::http_request *r)
 {
@@ -17,24 +20,39 @@ void Controller::Request_Handler(webserver::http_request *r)
         "<br><a href='/auth'>authentication example</a> [use <b>rene</b> as username and <b>secretGarden</b> as password"
         "<br><a href='/header'>show some HTTP header details</a> ";
 
+    std::string json_response;
+    std::map<std::string, std::string> json_map_response;
+
     if (r->path_ == "/")
     {
         title = "Web Server Example";
         body = "<h1>Welcome to Rene's Web Server</h1>"
                "I wonder what you're going to click" +
                links;
+
+        json_response =
+            "{"
+            "'path':'index',"
+            "'route': '/'"
+            "}";
+
+        json_map_response = {{"path", "index"}, {"route", "/"}};
     }
     else if (r->path_ == "/red")
     {
         bgcolor = "#ff4444";
         title = "You chose red";
         body = "<h1>Red</h1>" + links;
+
+        json_map_response = {{"path", "red-page"}, {"route", "/red"}};
     }
     else if (r->path_ == "/blue")
     {
         bgcolor = "#4444ff";
         title = "You chose blue";
         body = "<h1>Blue</h1>" + links;
+
+        json_map_response = {{"path", "blue-page"}, {"route", "/blue"}};
     }
     else if (r->path_ == "/form")
     {
@@ -58,6 +76,8 @@ void Controller::Request_Handler(webserver::http_request *r)
         }
 
         body += "<hr>" + links;
+
+        json_map_response = {{"path", "form-page"}, {"route", "/form"}};
     }
     else if (r->path_ == "/auth")
     {
@@ -77,6 +97,8 @@ void Controller::Request_Handler(webserver::http_request *r)
         {
             r->auth_realm_ = "Private Stuff";
         }
+
+        json_map_response = {{"path", "auth-page"}, {"route", "/auth"}};
     }
     else if (r->path_ == "/header")
     {
@@ -88,6 +110,8 @@ void Controller::Request_Handler(webserver::http_request *r)
                "<tr><td>User-Agent:</td><td>" + r->user_agent_ + "</td></tr>" +
                "</table>" +
                links;
+
+        json_map_response = {{"path", "header-page"}, {"route", "/header"}};
     }
     else
     {
@@ -95,11 +119,11 @@ void Controller::Request_Handler(webserver::http_request *r)
         title = "Wrong URL";
         body = "<h1>Wrong URL</h1>";
         body += "Path is : &gt;" + r->path_ + "&lt;";
+
+        json_map_response = {{"path", "404"}, {"status", "page non existent"}};
     }
 
-    r->answer_ = "<html><head><title>";
-    r->answer_ += title;
-    r->answer_ += "</title></head><body bgcolor='" + bgcolor + "'>";
-    r->answer_ += body;
-    r->answer_ += "</body></html>";
+    json jmap(json_map_response); // Converting map to JSON
+
+    r->answer_ = jmap.dump();
 };

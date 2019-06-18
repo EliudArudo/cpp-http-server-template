@@ -152,7 +152,11 @@ unsigned webserver::Request(void *ptr_s)
   s.SendLine(std::string("Date: ") + asctime_remove_nl + " GMT");
   s.SendLine(std::string("Server: ") + serverName);
   s.SendLine("Connection: close");
-  s.SendLine("Content-Type: text/html; charset=ISO-8859-1");
+  // s.SendLine("Content-Type: text/html; charset=ISO-8859-1");
+  /* 
+    * Content-Type : application/json has converted it to JSON now
+  */
+  s.SendLine("Content-Type: application/json");
   s.SendLine("Content-Length: " + str_str.str());
   s.SendLine("");
   s.SendLine(req.answer_);
