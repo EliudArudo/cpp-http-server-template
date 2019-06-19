@@ -94,6 +94,11 @@ unsigned webserver::Request(void *ptr_s)
 
     line = line.substr(0, pos_cr_lf);
 
+    // Debugging
+    std::string log_this = line;
+    std::cout << "Logged --line--:" << log_this << std::endl;
+    // Debugging
+
     if (line.substr(0, authorization.size()) == authorization)
     {
       req.authentication_given_ = true;
@@ -139,17 +144,20 @@ unsigned webserver::Request(void *ptr_s)
 
   s.SendBytes("HTTP/1.1 ");
 
-  if (!req.auth_realm_.empty())
-  {
-    s.SendLine("401 Unauthorized");
-    s.SendBytes("WWW-Authenticate: Basic Realm=\"");
-    s.SendBytes(req.auth_realm_);
-    s.SendLine("\"");
-  }
-  else
-  {
-    s.SendLine(req.status_);
-  }
+  // if (!req.auth_realm_.empty())
+  // {
+  //   s.SendLine("401 Unauthorized");
+  //   s.SendBytes("WWW-Authenticate: Basic Realm=\"");
+  //   s.SendBytes(req.auth_realm_);
+  //   s.SendLine("\"");
+  // }
+  // else
+  // {
+  //   s.SendLine(req.status_);
+  // }
+
+  s.SendLine(req.status_); // CHANGE - REMOVE
+
   s.SendLine(std::string("Date: ") + asctime_remove_nl + " GMT");
   s.SendLine(std::string("Server: ") + serverName);
   s.SendLine("Connection: close");
