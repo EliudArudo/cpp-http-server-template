@@ -14,6 +14,8 @@ int main()
   webserver(port, Controller::Request_Handler);
 }
 
+// ->> https://renenyffenegger.ch/notes/development/languages/C-C-plus-plus/Socket_cpp/examples
+
 // ------ Send requests to another server ----------
 
 // This is an example for Socket.cpp, a leight weight C++ class to demonstrate Sockets for Windows programming.
@@ -59,8 +61,6 @@ int main()
 
 //   return 0;
 // }
-
-
 
 // This is an example for Socket.cpp, a leight weight C++ class to demonstrate Sockets for Windows programming.
 // Message Distributor is a server that listens on port 2000. Any number of clients can connect to that server. When a client sends a message to the server, the server will broadcast this message to all other clients, but not to the one that sent the message.

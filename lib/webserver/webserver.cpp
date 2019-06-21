@@ -45,7 +45,7 @@ unsigned webserver::Request(void *ptr_s)
 {
   Socket s = *(reinterpret_cast<Socket *>(ptr_s));
 
-  std::string line = s.ReceiveLine();
+  std::string line = s.ReceiveLine(0);
   if (line.empty())
   {
     return 1;
@@ -67,7 +67,6 @@ unsigned webserver::Request(void *ptr_s)
 
   // size_t posStartPath = line.find_first_not_of(" ", 3);
   size_t posStartPath = line.find_first_not_of(" ", req.method_.length());
-
   SplitGetReq(line.substr(posStartPath), path, params);
 
   req.status_ = "202 OK";
@@ -81,24 +80,88 @@ unsigned webserver::Request(void *ptr_s)
   static const std::string accept_encoding = "Accept-Encoding: ";
   static const std::string user_agent = "User-Agent: ";
 
+  unsigned int index = 0;
+  unsigned int first_identifier_recorder = 0;
+  unsigned int last_identifier_recorder = 0;
+  std::string json_found = "";
+
+  std::string iden_open;
+  std::string iden_close;
+
+  unsigned int first_curly_index = 0;
+  unsigned int first_bracket_index = 0;
+
   while (1)
   {
-    line = s.ReceiveLine();
 
-    if (line.empty())
-      break;
+    if (req.method_ == "POST") // Get json data from POSTS
+    {
 
-    unsigned int pos_cr_lf = line.find_first_of("\x0a\x0d");
-    if (pos_cr_lf == 0)
-      break;
+      line = s.ReceiveLine(1);
 
-    line = line.substr(0, pos_cr_lf);
+      if (line.empty())
+        break;
+      // JSON picker - picks JSON from the request
+      if (first_bracket_index == 0)
+      {
+        first_bracket_index = line.find_first_of("[") == 0 ? index : 0;
+      }
 
-    // Debugging
-    std::string log_this = line;
-    std::cout << "Logged --line--:" << log_this << std::endl;
-    // Debugging
+      if (first_curly_index == 0)
+      {
+        first_curly_index = line.find_first_of("{") == 0 ? index : 0;
+      }
 
+      if (first_curly_index > 0 || first_bracket_index > 0)
+      {
+
+        // Goes both ways
+        if (first_curly_index > 0 && first_bracket_index == 0)
+          iden_open = "{";
+        else if (first_bracket_index > 0 && first_curly_index == 0)
+          iden_open = "[";
+
+        iden_close = iden_open == "{" ? "}" : "]";
+
+        unsigned int first_identifier = line.find_first_of(iden_open);
+        unsigned int last_identifier = line.find_first_of(iden_close);
+
+        json_found += line;
+
+        if (first_identifier == 0) // If bracket is found
+        {
+          first_identifier_recorder++; // Add frequency of identifier
+        }
+
+        if (last_identifier == 0) // If bracket is found
+        {
+          last_identifier_recorder++; // Add frequency of identifier
+        }
+
+        if (first_identifier_recorder > 0 && last_identifier_recorder > 0 && (first_identifier_recorder == last_identifier_recorder))
+        {
+          break;
+        }
+      }
+      // JSON picker - picks JSON from the request
+
+      index++;
+    }
+    else if (req.method_ == "GET")
+    {
+      line = s.ReceiveLine(0);
+
+      if (line.empty())
+        break;
+
+      unsigned int pos_cr_lf = line.find_first_of("\x0a\x0d");
+      if (pos_cr_lf == 0)
+        break;
+
+      line = line.substr(0, pos_cr_lf);
+    }
+
+    // Rest of the original code
     if (line.substr(0, authorization.size()) == authorization)
     {
       req.authentication_given_ = true;
@@ -127,6 +190,10 @@ unsigned webserver::Request(void *ptr_s)
       req.user_agent_ = line.substr(user_agent.size());
     }
   }
+
+  // --------------------------- if method is POST, and we posted json, json_found is our guy ------------------------------- //
+  std::cout << json_found << std::endl;
+  // --------------------------- if method is POST, and we posted json, json_found is our guy ------------------------------- //
 
   request_func_(&req);
 

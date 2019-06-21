@@ -138,7 +138,7 @@ std::string Socket::ReceiveBytes()
   return ret;
 }
 
-std::string Socket::ReceiveLine()
+std::string Socket::ReceiveLine(int more)
 {
   std::string ret;
   while (1)
@@ -163,8 +163,16 @@ std::string Socket::ReceiveLine()
     }
 
     ret += r;
-    if (r == '\n')
+
+    if (more == 0)
+    {
+      if (r == '\n')
+        return ret;
+    }
+    else // Removing this allows for json objects to be picked
+    {
       return ret;
+    }
   }
 }
 
