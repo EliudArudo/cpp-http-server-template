@@ -54,13 +54,15 @@ unsigned webserver::Request(void *ptr_s)
   http_request req;
 
   if (line.find("GET") == 0)
-  {
     req.method_ = "GET";
-  }
   else if (line.find("POST") == 0)
-  {
     req.method_ = "POST";
-  }
+  else if (line.find("PUT") == 0) // Currently not yet supported
+    req.method_ = "PUT";
+  else if (line.find("PATCH") == 0) // Currently not yet supported
+    req.method_ = "PATCH";
+  else if (line.find("DELETE") == 0) // Currently not yet supported
+    req.method_ = "DELETE";
 
   std::string path;
   std::map<std::string, std::string> params;
@@ -160,6 +162,10 @@ unsigned webserver::Request(void *ptr_s)
 
       line = line.substr(0, pos_cr_lf);
     }
+    else
+    {
+      break; // PUT, PATCH, DELETE not yet supported
+    }
 
     // Rest of the original code
     if (line.substr(0, authorization.size()) == authorization)
@@ -191,9 +197,12 @@ unsigned webserver::Request(void *ptr_s)
     }
   }
 
-  // --------------------------- if method is POST, and we posted json, json_found is our guy ------------------------------- //
-  std::cout << json_found << std::endl;
-  // --------------------------- if method is POST, and we posted json, json_found is our guy ------------------------------- //
+  if (req.method_ == "POST")
+  {
+    // --------------------------- if method is POST, and we posted json, json_found is our guy ------------------------------- //
+    std::cout << json_found << std::endl;
+    // --------------------------- if method is POST, and we posted json, json_found is our guy ------------------------------- //
+  }
 
   request_func_(&req);
 

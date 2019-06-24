@@ -12,121 +12,192 @@ void Controller::Request_Handler(webserver::http_request *r)
 {
     Socket s = *(r->s_);
 
-    std::string title;
-    std::string body;
-    std::string bgcolor = "#ffffff";
-    std::string links =
-        "<p><a href='/red'>red</a> "
-        "<br><a href='/blue'>blue</a> "
-        "<br><a href='/form'>form</a> "
-        "<br><a href='/auth'>authentication example</a> [use <b>rene</b> as username and <b>secretGarden</b> as password"
-        "<br><a href='/header'>show some HTTP header details</a> ";
+    if (r->method_ == "POST")
+        POST_handler(r);
+    else if (r->method_ == "GET")
+        GET_handler(r);
+    else
+        Handle_404(r);
+};
+
+void Controller::POST_handler(webserver::http_request *r)
+{
+
+    std::cout << "POST Handler called" << std::endl;
+
+    Socket s = *(r->s_);
 
     std::string json_response;
     std::map<std::string, std::string> json_map_response;
 
     if (r->path_ == "/")
     {
-        title = "Web Server Example";
-        body = "<h1>Welcome to Rene's Web Server</h1>"
-               "I wonder what you're going to click" +
-               links;
-
-        json_response =
-            "{"
-            "'path':'index',"
-            "'route': '/'"
-            "}";
-
         json_map_response = {{"path", "index"}, {"route", "/"}};
     }
     else if (r->path_ == "/red")
     {
-        bgcolor = "#ff4444";
-        title = "You chose red";
-        body = "<h1>Red</h1>" + links;
-
         json_map_response = {{"path", "red-page"}, {"route", "/red"}};
     }
     else if (r->path_ == "/blue")
     {
-        bgcolor = "#4444ff";
-        title = "You chose blue";
-        body = "<h1>Blue</h1>" + links;
-
         json_map_response = {{"path", "blue-page"}, {"route", "/blue"}};
     }
     else if (r->path_ == "/form")
     {
-        title = "Fill a form";
+        // title = "Fill a form";
 
-        body = "<h1>Fill a form</h1>";
-        body += "<form action='/form'>"
-                "<table>"
-                "<tr><td>Field 1</td><td><input name=field_1></td></tr>"
-                "<tr><td>Field 2</td><td><input name=field_2></td></tr>"
-                "<tr><td>Field 3</td><td><input name=field_3></td></tr>"
-                "</table>"
-                "<input type=submit></form>";
+        // body = "<h1>Fill a form</h1>";
+        // body += "<form action='/form'>"
+        //         "<table>"
+        //         "<tr><td>Field 1</td><td><input name=field_1></td></tr>"
+        //         "<tr><td>Field 2</td><td><input name=field_2></td></tr>"
+        //         "<tr><td>Field 3</td><td><input name=field_3></td></tr>"
+        //         "</table>"
+        //         "<input type=submit></form>";
 
-        for (std::map<std::string, std::string>::const_iterator i = r->params_.begin();
-             i != r->params_.end();
-             i++)
-        {
+        // for (std::map<std::string, std::string>::const_iterator i = r->params_.begin();
+        //      i != r->params_.end();
+        //      i++)
+        // {
 
-            body += "<br>" + i->first + " = " + i->second;
-        }
+        //     body += "<br>" + i->first + " = " + i->second;
+        // }
 
-        body += "<hr>" + links;
+        // body += "<hr>" + links;
 
         json_map_response = {{"path", "form-page"}, {"route", "/form"}};
     }
     else if (r->path_ == "/auth")
     {
-        if (r->authentication_given_)
-        {
-            if (r->username_ == "rene" && r->password_ == "secretGarden")
-            {
-                body = "<h1>Successfully authenticated</h1>" + links;
-            }
-            else
-            {
-                body = "<h1>Wrong username or password</h1>" + links;
-                r->auth_realm_ = "Private Stuff";
-            }
-        }
-        else
-        {
-            r->auth_realm_ = "Private Stuff";
-        }
+        // if (r->authentication_given_)
+        // {
+        //     if (r->username_ == "rene" && r->password_ == "secretGarden")
+        //     {
+        //         body = "<h1>Successfully authenticated</h1>" + links;
+        //     }
+        //     else
+        //     {
+        //         body = "<h1>Wrong username or password</h1>" + links;
+        //         r->auth_realm_ = "Private Stuff";
+        //     }
+        // }
+        // else
+        // {
+        //     r->auth_realm_ = "Private Stuff";
+        // }
 
         json_map_response = {{"path", "auth-page"}, {"route", "/auth"}};
     }
     else if (r->path_ == "/header")
     {
-        title = "some HTTP header details";
-        body = std::string("<table>") +
-               "<tr><td>Accept:</td><td>" + r->accept_ + "</td></tr>" +
-               "<tr><td>Accept-Encoding:</td><td>" + r->accept_encoding_ + "</td></tr>" +
-               "<tr><td>Accept-Language:</td><td>" + r->accept_language_ + "</td></tr>" +
-               "<tr><td>User-Agent:</td><td>" + r->user_agent_ + "</td></tr>" +
-               "</table>" +
-               links;
-
         json_map_response = {{"path", "header-page"}, {"route", "/header"}};
     }
     else
     {
-
-        r->status_ = "404 Not Found";
-        title = "Wrong URL";
-        body = "<h1>Wrong URL</h1>";
-        body += "Path is : &gt;" + r->path_ + "&lt;";
-
-        json_map_response = {{"path", "404"}, {"status", "page non existent"}};
+        Handle_404(r);
+        return;
     }
 
     json jmap(json_map_response); // Converting map to JSON
 
     r->answer_ = jmap.dump(); // Find out how to receive data
-};
+}
+
+void Controller::GET_handler(webserver::http_request *r)
+{
+
+    std::cout << "GET Handler called" << std::endl;
+
+    Socket s = *(r->s_);
+
+    std::string json_response;
+    std::map<std::string, std::string> json_map_response;
+
+    if (r->path_ == "/")
+    {
+        json_map_response = {{"path", "index"}, {"route", "/"}};
+    }
+    else if (r->path_ == "/red")
+    {
+
+        json_map_response = {{"path", "red-page"}, {"route", "/red"}};
+    }
+    else if (r->path_ == "/blue")
+    {
+        json_map_response = {{"path", "blue-page"}, {"route", "/blue"}};
+    }
+    else if (r->path_ == "/form")
+    {
+        // title = "Fill a form";
+
+        // body = "<h1>Fill a form</h1>";
+        // body += "<form action='/form'>"
+        //         "<table>"
+        //         "<tr><td>Field 1</td><td><input name=field_1></td></tr>"
+        //         "<tr><td>Field 2</td><td><input name=field_2></td></tr>"
+        //         "<tr><td>Field 3</td><td><input name=field_3></td></tr>"
+        //         "</table>"
+        //         "<input type=submit></form>";
+
+        // for (std::map<std::string, std::string>::const_iterator i = r->params_.begin();
+        //      i != r->params_.end();
+        //      i++)
+        // {
+
+        //     body += "<br>" + i->first + " = " + i->second;
+        // }
+
+        // body += "<hr>" + links;
+
+        json_map_response = {{"path", "form-page"}, {"route", "/form"}};
+    }
+    else if (r->path_ == "/auth")
+    {
+        // if (r->authentication_given_)
+        // {
+        //     if (r->username_ == "rene" && r->password_ == "secretGarden")
+        //     {
+        //         body = "<h1>Successfully authenticated</h1>" + links;
+        //     }
+        //     else
+        //     {
+        //         body = "<h1>Wrong username or password</h1>" + links;
+        //         r->auth_realm_ = "Private Stuff";
+        //     }
+        // }
+        // else
+        // {
+        //     r->auth_realm_ = "Private Stuff";
+        // }
+
+        json_map_response = {{"path", "auth-page"}, {"route", "/auth"}};
+    }
+    else if (r->path_ == "/header")
+    {
+        json_map_response = {{"path", "header-page"}, {"route", "/header"}};
+    }
+    else
+    {
+        Handle_404(r);
+        return;
+    }
+
+    json jmap(json_map_response); // Converting map to JSON
+
+    r->answer_ = jmap.dump(); // Find out how to receive data
+}
+
+void Controller::Handle_404(webserver::http_request *r)
+{
+
+    std::cout << "404 Handler called" << std::endl;
+
+    std::map<std::string, std::string> json_map_response;
+
+    r->status_ = "404 not found";
+    json_map_response = {{"path", "404"}, {"status", "page non existent"}};
+
+    json jmap(json_map_response); // Converting map to JSON
+
+    r->answer_ = jmap.dump(); // Find out how to receive data
+}
