@@ -38,6 +38,9 @@
 #include "..\socket\src\Socket.h"
 #include "..\UrlHelper\UrlHelper.h"
 #include "..\base64\base64.h"
+#include "..\nlohmann\json.hpp"
+
+using nlohmann::json;
 
 webserver::request_func webserver::request_func_ = 0;
 
@@ -96,23 +99,22 @@ unsigned webserver::Request(void *ptr_s)
   while (1)
   {
 
-    if (req.method_ == "POST") // Get json data from POSTS
+    if (req.method_ == "POST" || req.method_ == "PUT") // Get json data from POSTS
     {
 
       line = s.ReceiveLine(1);
 
       if (line.empty())
         break;
-      // JSON picker - picks JSON from the request
-      if (first_bracket_index == 0)
-      {
-        first_bracket_index = line.find_first_of("[") == 0 ? index : 0;
-      }
 
+      // JSON picker - picks JSON from the request
+      // -> Should stay in separate if() blocks
+      if (first_bracket_index == 0)
+        first_bracket_index = line.find_first_of("[") == 0 ? index : 0;
+
+      // -> Should stay in separate if() blocks
       if (first_curly_index == 0)
-      {
         first_curly_index = line.find_first_of("{") == 0 ? index : 0;
-      }
 
       if (first_curly_index > 0 || first_bracket_index > 0)
       {
@@ -197,12 +199,8 @@ unsigned webserver::Request(void *ptr_s)
     }
   }
 
-  if (req.method_ == "POST")
-  {
-    // --------------------------- if method is POST, and we posted json, json_found is our guy ------------------------------- //
-    std::cout << json_found << std::endl;
-    // --------------------------- if method is POST, and we posted json, json_found is our guy ------------------------------- //
-  }
+  if ((req.method_ == "POST" || req.method_ == "PUT") && json_found.length() > 0)
+    req.raw_body_data_ = json_found;
 
   request_func_(&req);
 

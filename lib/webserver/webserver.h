@@ -44,6 +44,9 @@ public:
       std::string path_;
       std::map<std::string, std::string> params_;
 
+      // New data got from posts with JSON body
+      std::string raw_body_data_;
+
       std::string accept_;
       std::string accept_language_;
       std::string accept_encoding_;

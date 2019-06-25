@@ -6,14 +6,18 @@
  *  -- Meaning, webserver.cpp has to be modified to receive 'DELETE', 'PUT', 'PATCH' + more
  *  ** Issues to fix
  *    - POST without any data is not handled
- *    - 404 Handler is called for unsupported methods, but no JSON is sent
- *  
+ *    - 404 Handler is called for unsupported methods, but no JSON is sent back
+ *  -- Get params from GET requests 
+ * 
  *  webserver.cpp Refactor the JSON EXTRACTION CLASS to a new one
  *  -- Could make it a class so that we can do more with is, such as outputting JSON object -- I'm convinced
- *  -- Getting params from GET requests
+ *  
  *---------------- 
 
  */
+
+// nlohmann/json
+// https://github.com/nlohmann/json/blob/develop/single_include/nlohmann/json.hpp
 
 #include "lib\webserver\webserver.h"
 #include "lib\controllers\controllers.h"
