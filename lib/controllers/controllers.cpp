@@ -25,8 +25,11 @@ void Controller::Request_Handler(webserver::http_request *r)
 
     if (r->raw_body_data_.length() > 0)
     {
+        // Parsing string to a JSON object
+        auto extracted_json = json::parse(r->raw_body_data_); // create JSON object from string literal
+
         std::cout << "Data sent along with the " << r->method_ << " request to '" << r->path_ << "' path :" << std::endl;
-        std::cout << r->raw_body_data_ << std::endl;
+        std::cout << extracted_json.dump(4) << std::endl;
     }
 
     // Mapping Request methods to repective handlers

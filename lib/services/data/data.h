@@ -9,9 +9,13 @@ public:
     std::string static mapToString(std::map<std::string, std::string>);
 };
 
+// create object from string literal
+// json j = "{ \"happy\": true, \"pi\": 3.141 }"_json;
+// auto j3 = json::parse("{ \"happy\": true, \"pi\": 3.141 }");
+
 // namespace ns
 // {
-//                 
+//
 // struct person // a simple struct to model a person
 // {
 //     std::string name;
