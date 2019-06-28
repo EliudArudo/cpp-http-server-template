@@ -1,4 +1,4 @@
-## C++ Web Server Template
+## C++ HTTP Server Template
 A Web Server Template built on [Rene Nyffenegger's simple web server](https://github.com/ReneNyffenegger/cpp-webserver).
 Currently supports windows only, linux support will be added later.
 
